@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>byteSpace</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="signup-wrapper">
+        <div class="floating-shape"></div>
+        <div class="floating-shape-2"></div>
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-s">
+                <img src="assets/images/byteSpace-logo.png" alt="logo-icon">
+            </div>
+        </div>
+        <h1 id="signup-title">Sign up to byteSpace!</h1><br>
+        <!-- End of the Logo -->
+        <div class="container">
+                <!-- Signup Form when no success message is set -->
+                <div class="signup-container">
+                    <form action="../functions/signup.php" method="post" class="signup-form">
+                        <div class="input-row-container">
+                            <div class="input-row">
+                                <label for="first_name">First Name</label>
+                                <input id="first_name" class="inner-input" type="text" name="first_name" required />
+                            </div>
+                            <div class="input-row">
+                                <label for="last_name">Last Name</label>
+                                <input id="last_name" class="inner-input" type="text" name="last_name" required />
+                            </div>
+                        </div>
+                        <label for="email">Email</label>
+                        <input id="email" class="inner-input" type="email" name="email" required />
+
+                        <label for="username">Username</label>
+                        <input id="username" class="inner-input" type="text" name="username" required />
+
+                        <label for="password">Password</label>
+                        <input id="password" class="inner-input" type="password" name="password" required />
+
+                        <button type="submit" name="Submit" class="signup-btn-big">Sign Up</button>
+                    </form>
+                </div>
+                <div class="bottom-container">
+                    <p>Already have an account? <span><a href="login.html">Log In.</a></span></p>
+                </div>
+        </div>
+    </div>
+</body>
+
+</html>
