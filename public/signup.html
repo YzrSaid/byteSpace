@@ -6,51 +6,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>byteSpace</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <div class="signup-wrapper">
+        <div class="stars"></div>
         <div class="floating-shape"></div>
         <div class="floating-shape-2"></div>
         <!-- Logo -->
         <div class="logo-container">
             <div class="logo-s">
-                <img src="assets/images/byteSpace-logo.png" alt="logo-icon">
+                <a href="/"><img src="assets/images/byteSpace-logo.png" alt="logo-icon"></a>
             </div>
         </div>
         <h1 id="signup-title">Sign up to byteSpace!</h1><br>
         <!-- End of the Logo -->
         <div class="container">
-                <!-- Signup Form when no success message is set -->
-                <div class="signup-container">
-                    <form action="../functions/signup.php" method="post" class="signup-form">
-                        <div class="input-row-container">
-                            <div class="input-row">
-                                <label for="first_name">First Name</label>
-                                <input id="first_name" class="inner-input" type="text" name="first_name" required />
-                            </div>
-                            <div class="input-row">
-                                <label for="last_name">Last Name</label>
-                                <input id="last_name" class="inner-input" type="text" name="last_name" required />
-                            </div>
+            <!-- Signup Form when no success message is set -->
+            <div class="signup-container">
+                <form id="signup-form" method="post" class="signup-form">
+                    <div class="input-row-container">
+                        <div class="input-row">
+                            <label for="first_name">First Name</label>
+                            <input id="first_name" class="inner-input" type="text" name="first_name" required />
                         </div>
-                        <label for="email">Email</label>
-                        <input id="email" class="inner-input" type="email" name="email" required />
+                        <div class="input-row">
+                            <label for="last_name">Last Name</label>
+                            <input id="last_name" class="inner-input" type="text" name="last_name" required />
+                        </div>
+                    </div>
+                    <label for="email">Email</label>
+                    <input id="email" class="inner-input" type="email" name="email" required />
 
-                        <label for="username">Username</label>
-                        <input id="username" class="inner-input" type="text" name="username" required />
+                    <label for="username">Username</label>
+                    <input id="username" class="inner-input" type="text" name="username" required />
 
-                        <label for="password">Password</label>
-                        <input id="password" class="inner-input" type="password" name="password" required />
+                    <label for="password">Password</label>
+                    <input id="password" class="inner-input" type="password" name="password" required />
 
-                        <button type="submit" name="Submit" class="signup-btn-big">Sign Up</button>
-                    </form>
-                </div>
-                <div class="bottom-container">
-                    <p>Already have an account? <span><a href="login.html">Log In.</a></span></p>
-                </div>
+                    <button type="submit" name="Submit" class="signup-btn-big">Sign Up</button>
+                </form>
+            </div>
+            <div class="bottom-container">
+                <p>Already have an account? <span><a href="login.html">Log In.</a></span></p>
+            </div>
         </div>
     </div>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("signup-form");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch("/api/signup", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    const result = await response.text(); // or .json() if your server sends JSON
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Signup successful!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.href = '/login.html'; // Redirect to login after signup
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Signup failed',
+                            text: result // Display the error message from the backend
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Something went wrong',
+                        text: 'Please try again later.'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

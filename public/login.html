@@ -6,17 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>byteSpace</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
+    
     <div class="login-wrapper">
+        <div class="stars"></div>
         <div class="floating-shape"></div>
         <div class="floating-shape-2"></div>
-
         <!-- Logo -->
         <div class="logo-container">
             <div class="logo-s">
-                <img src="assets/images/byteSpace-logo.png" alt="logo-icon">
+                <a href="/"><img src="assets/images/byteSpace-logo.png" alt="logo-icon"></a>
             </div>
         </div>
         <h1 id="login-title">Log in to byteSpace!</h1>
@@ -33,10 +35,61 @@
                 </form>
             </div>
             <div class="bottom-container">
-                <p>Don't have an account? <span><a href="signup.html">Sign Up.</a></span></p>
+                <p>Don't have an account? <span><a href="/signup">Sign Up.</a></span></p>
             </div>
         </div>
     </div>
+
+    <script src="js/main.js"></script>
 </body>
+
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector(".login-form");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.text(); 
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Logged in!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = '/dashboard'; 
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login failed',
+                    text: result 
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong',
+                text: 'Please try again later.',
+            });
+        }
+    });
+});
+
+</script>
 
 </html>
