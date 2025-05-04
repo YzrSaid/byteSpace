@@ -268,7 +268,7 @@ label {
   align-items: center;
 }
 
-#integrity-div {
+#integrity-div, #extension-check-div {
   flex-direction: column;
   display: flex;
   align-items: center;
@@ -699,7 +699,7 @@ footer p {
 }
 
 #fileForm {
-  z-index: 9999;
+  z-index: 1000;
   background-color: #ffffff;
   width: 30%;
   padding: 20px;

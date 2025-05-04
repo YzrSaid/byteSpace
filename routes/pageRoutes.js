@@ -35,6 +35,12 @@ router.get("/file-integrity-checker", isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, "../public/file-integrity-checker.html"));
 })
 
+// File Extension Checker  (protected)
+router.get("/extension-check", isAuthenticated, (req, res) => {
+    // If authenticated, serve the page
+    res.sendFile(path.join(__dirname, "../public/file-extension-checker.html"));
+})
+
 // Access the username
 router.get("/user-info", (req, res) => {
     if (req.session.user) {

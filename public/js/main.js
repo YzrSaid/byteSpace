@@ -77,120 +77,102 @@ function handleNavbarBackground() {
   }
 }
 
+// Override default anchor behavior to scroll with offset
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  anchor.addEventListener("click", function (e) {
+    const targetId = this.getAttribute("href").substring(1);
+    const targetElement = document.getElementById(targetId);
+    if (!targetElement) return;
+
+    e.preventDefault();
+
+    const navbarHeight = document.getElementById("navbar")?.offsetHeight || 0;
+    const elementPosition = targetElement.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.scrollY - navbarHeight;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
+  });
+});
+
+
 window.addEventListener("scroll", handleNavbarBackground);
 
 // This is for navbar links
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Ensure the navbar exists before proceeding
   const navbar = document.getElementById("navbar");
-  if (!navbar) return; // Exit if navbar is not found
+  if (!navbar) return;
 
-  // Get the navbar links
   const navbarLinks = document.querySelectorAll(".main-navbar a");
-  if (navbarLinks.length === 0) return; // Exit if no navbar links are found
+  if (navbarLinks.length === 0) return;
 
-  // Get the navbar height
+  const sections = document.querySelectorAll(
+    "#first-div, #second-div, #third-div"
+  );
+  const hasSections = sections.length > 0;
+
   const navbarHeight = navbar.offsetHeight;
 
-  // Scroll to the section with the offset when a link is clicked
-  navbarLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-
-      // Get the target section from the link's href attribute
-      const targetId = this.getAttribute("href").substring(1);
-      const targetElement = document.getElementById(targetId);
-
-      // Ensure the target element exists
-      if (targetElement) {
-        // Scroll to the target section with an offset for the navbar height
-        window.scrollTo({
-          top: targetElement.offsetTop - navbarHeight,
-          behavior: "smooth",
-        });
-      }
-    });
-  });
-
-  // Function to remove 'active' class from all navbar links
   function removeActiveClass() {
     navbarLinks.forEach((link) => {
       link.classList.remove("active");
     });
   }
 
-  // Function to add 'active' class to clicked navbar link
   function addActiveClass(link) {
     link.classList.add("active");
   }
 
-  // Function to scroll smoothly to the section
-  function scrollToSection(link) {
-    const targetId = link.getAttribute("href").substring(1); // Get section id
-    const targetElement = document.getElementById(targetId);
+  // For scroll behavior, only add listener if the sections exist
+  if (hasSections) {
+    const options = {
+      rootMargin: "0px",
+      threshold: 0.5,
+    };
 
-    // Ensure the target element exists
-    if (targetElement) {
-      window.scrollTo({
-        top: targetElement.offsetTop - navbarHeight,
-        behavior: "smooth",
+    const callback = (entries) => {
+      entries.forEach((entry) => {
+        const sectionId = entry.target.id;
+        const link = document.querySelector(
+          `.main-navbar a[href="#${sectionId}"]`
+        );
+        if (entry.isIntersecting && link) {
+          removeActiveClass();
+          addActiveClass(link);
+        }
       });
-    }
-  }
+    };
 
-  // Intersection Observer to add active class when sections come into view
-  const options = {
-    rootMargin: "0px",
-    threshold: 0.5,
-  };
+    const observer = new IntersectionObserver(callback, options);
+    sections.forEach((section) => observer.observe(section));
+  } else {
+    // No scroll sections: Set based on current URL
+    const currentPath = window.location.pathname;
 
-  // Callback function to handle active class on scroll
-  const callback = (entries, observer) => {
-    entries.forEach((entry) => {
-      const sectionId = entry.target.id;
-      const link = document.querySelector(
-        `.main-navbar a[href="#${sectionId}"]`
-      );
+    removeActiveClass();
 
-      if (entry.isIntersecting) {
-        // Remove active class from all links
-        removeActiveClass();
-        // Add active class to the corresponding link
+    navbarLinks.forEach((link) => {
+      const page = link.getAttribute("data-page");
+      if (!page) return;
+
+      const fullMatch = `/${page}` === currentPath;
+      const isFeaturesDropdown =
+        page === "features" &&
+        [
+          "/extension-check",
+          "/file-integrity-checker",
+          "/malware-scan",
+        ].includes(currentPath);
+
+      if (fullMatch || isFeaturesDropdown) {
         addActiveClass(link);
       }
     });
-  };
-
-  // Create an intersection observer instance
-  const observer = new IntersectionObserver(callback, options);
-
-  // Observe the sections if they exist
-  const sections = document.querySelectorAll(
-    "#first-div, #second-div, #third-div"
-  );
-  if (sections.length > 0) {
-    sections.forEach((section) => {
-      observer.observe(section);
-    });
   }
-
-  // Scroll to section when navbar link is clicked
-  navbarLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault(); // Prevent default anchor behavior
-
-      // Remove active class from all links
-      removeActiveClass();
-
-      // Add active class to the clicked link
-      addActiveClass(this);
-
-      // Scroll to the target section
-      scrollToSection(this);
-    });
-  });
 });
+
 // this is for the scrolltotop btn
 // Get the button
 const scrollToTopBtn = document.getElementById("scrollToTopBtn");

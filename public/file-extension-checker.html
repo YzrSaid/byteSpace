@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
     <!-- Include Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet"
@@ -18,7 +17,6 @@
     <!-- For Montserrat Font -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
-
 
 <body>
     <nav id="navbar" class="navbar">
@@ -58,30 +56,19 @@
 
     <div class="main-div">
         <div class="stars"></div>
-        <div id="integrity-div">
-            <h1>File Integrity Checker</h1>
-            <p>Verify that your file has not been tampered with by checking its hash value.</p> <br>
+        <div id="extension-check-div">
+            <h1>File Extension Check</h1>
+            <p>Verify that the file's extension matches its MIME type.</p> <br>
 
             <!-- File upload form -->
             <form id="fileForm" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="fileInput">Choose a file to check:</label>
-                    <input type="file" id="fileInput" name="file" accept="*/*" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="expectedHash">Paste expected hash (optional):</label>
-                    <div class="input-with-icon">
-                        <input class="inner-input" type="text" id="expectedHash" name="expectedHash"
-                            placeholder="Enter known SHA-256 hash">
-                    </div>
+                    <input type="file" id="fileInput" name="file" accept="image/*,application/pdf,*/*" required>
                 </div>
 
                 <div class="main-buttons-container">
-                    <button type="submit" class="submit-btn">Check Integrity</button>
-                    <button title="Copy" type="button" class="copy-btn" onclick="copyHashToClipboard()">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
+                    <button type="submit" class="submit-btn">Check Extension</button>
                     <button title="Again" type="button" id="checkAnotherBtn" class="check-another-btn"
                         onclick="resetForm()">
                         <i class="fas fa-redo"></i>
@@ -100,7 +87,6 @@
 
         </div>
 
-
     </div>
 
     <!-- FontAwesome Script -->
@@ -113,19 +99,6 @@
     <script src="/js/main.js"></script>
 
     <script>
-        document.querySelector(".login-btn").addEventListener("click", function (e) {
-            fetch("/api/logout", {
-                method: "POST",
-            })
-                .then((res) => {
-                    if (res.ok) {
-                        window.location.href = "/";
-                    } else {
-                        alert("Logout failed.");
-                    }
-                })
-                .catch(() => alert("Logout request error."));
-        });
         document.querySelector("#fileForm").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -136,7 +109,7 @@
                 const formData = new FormData();
                 formData.append("file", file);
 
-                fetch("/api/check-file-integrity", {
+                fetch("/api/check-file-extension", {
                     method: "POST",
                     body: formData
                 })
@@ -146,34 +119,15 @@
                         resultDiv.innerHTML = ""; // Clear before showing new result
 
                         if (data.success) {
-                            const expectedHash = document.getElementById("expectedHash")?.value.trim();
-
-                            let message;
-                            if (expectedHash) {
-                                if (expectedHash === data.hash) {
-                                    message = `<p><strong style="color:green;">Hash matches!</strong> ✅<br>`;
-                                } else {
-                                    message = `<p><strong style="color:red;">Hash does not match!</strong> ❌<br>`;
-                                }
-                                message += `Computed hash: <code id="hashText">${data.hash}</code></p>`;
-                            } else {
-                                message = `<p>File hash: <code id="hashText">${data.hash}</code></p>`;
-                            }
-
-                            // Add the message to the result div
-                            resultDiv.innerHTML = message;
-
-                            // Show the "Copy Hash" and "Check another file" button
-                            const copyBtn = document.querySelector(".copy-btn");
-                            const anotherFileBtn = document.querySelector(".check-another-btn");
-                            if (copyBtn) {
-                                copyBtn.style.display = 'inline-block';
-                            }
-                            if (anotherFileBtn) {
-                                checkAnotherBtn.style.display = 'inline-block';
-                            }
+                            resultDiv.innerHTML = `<p><strong style="color:green;">File extension is valid!</strong> ✅</p>`;
                         } else {
-                            resultDiv.innerHTML = `Error: ${data.message}`;
+                            resultDiv.innerHTML = `<p><strong style="color:red;">File extension is invalid!</strong> ❌</p>`;
+                        }
+
+                        // Show the "Check another file" button
+                        const anotherFileBtn = document.querySelector(".check-another-btn");
+                        if (anotherFileBtn) {
+                            checkAnotherBtn.style.display = 'inline-block';
                         }
                     })
                     .catch(error => {
@@ -187,43 +141,20 @@
             }
         });
 
-        // Function to copy hash to clipboard
-        function copyHashToClipboard() {
-            const hashText = document.getElementById("hashText").innerText;
-            navigator.clipboard.writeText(hashText)
-                .then(() => {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Hash copied to clipboard!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                })
-                .catch(err => {
-                    console.error('Failed to copy: ', err);
-                });
-        }
-
         // Function to reset form for another file check
         function resetForm() {
             // Clear result section
             document.getElementById("result").innerHTML = "";
 
-            // Reset file input and expected hash
+            // Reset file input
             document.getElementById("fileInput").value = "";
-            document.getElementById("expectedHash").value = "";
 
             // Hide buttons again
-            document.querySelector(".copy-btn").style.display = 'none';
             document.querySelector(".check-another-btn").style.display = 'none';
 
             // Scroll to the top
             window.scrollTo(0, 0);
         }
-
-
     </script>
 </body>
 

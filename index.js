@@ -15,7 +15,7 @@ app.use(
     saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 30,
+      maxAge: 1000 * 60 * 60,
     },
   })
 );
@@ -25,9 +25,11 @@ app.use(
 const authRoutes = require("./routes/authRoutes");
 const pageRoutes = require("./routes/pageRoutes");
 const integrityRoutes = require("./routes/check-file.integrity");
+const extensionRoutes = require("./routes/check-file-extension")
 
 app.use("/api", authRoutes);
 app.use("/api", integrityRoutes); 
+app.use("/api", extensionRoutes);
 app.use("/", pageRoutes);
 
 // Serve static files AFTER routes
