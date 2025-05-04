@@ -8,26 +8,26 @@ exports.checkFileIntegrity = async (req, res) => {
     }
 
     const filePath = req.file.path;
-    const originalExtension = path.extname(req.file.originalname).toLowerCase().replace('.', ''); // Get file extension
-    const expectedMimeType = getMimeTypeFromExtension(originalExtension); // Get expected MIME type based on the extension
+    const originalExtension = path.extname(req.file.originalname).toLowerCase().replace('.', ''); 
+    const expectedMimeType = getMimeTypeFromExtension(originalExtension); 
 
-    console.log("Original Extension:", originalExtension); // Debugging: Show the original file extension
-    console.log("Expected MIME type:", expectedMimeType); // Debugging: Show expected MIME type
+    console.log("Original Extension:", originalExtension); 
+    console.log("Expected MIME type:", expectedMimeType); 
 
     try {
-        const fileBuffer = fs.readFileSync(filePath); // Read file content into buffer
-        const fileTypeResult = await fileType.fromBuffer(fileBuffer); // Detect file type from buffer
+        const fileBuffer = fs.readFileSync(filePath); 
+        const fileTypeResult = await fileType.fromBuffer(fileBuffer); 
 
-        fs.unlinkSync(filePath); // Clean up file after processing
+        fs.unlinkSync(filePath); 
 
         if (!fileTypeResult) {
             return res.status(400).json({ success: false, message: 'Unable to determine file type' });
         }
 
-        const actualExtension = fileTypeResult.ext.toLowerCase(); // Extract actual extension
-        const actualMimeType = fileTypeResult.mime; // Get actual MIME type
-        console.log("Actual Extension (from file type detection):", actualExtension); // Debugging: Show detected extension
-        console.log("Actual MIME type (from file type detection):", actualMimeType); // Debugging: Show detected MIME type
+        const actualExtension = fileTypeResult.ext.toLowerCase(); 
+        const actualMimeType = fileTypeResult.mime; 
+        console.log("Actual Extension (from file type detection):", actualExtension); 
+        console.log("Actual MIME type (from file type detection):", actualMimeType); 
 
         // Check if content matches the expected file type (i.e., the original extension)
         const isExtensionValid = actualExtension === originalExtension;
@@ -56,7 +56,7 @@ exports.checkFileIntegrity = async (req, res) => {
         });
 
     } catch (err) {
-        console.error("Error processing file:", err); // Debugging: Log error
+        console.error("Error processing file:", err); 
         return res.status(500).json({ success: false, message: 'Error processing file' });
     }
 };
@@ -68,8 +68,7 @@ function getMimeTypeFromExtension(extension) {
         'png': 'image/png',
         'jpg': 'image/jpeg',
         'jpeg': 'image/jpeg',
-        // Add other mime types as needed
     };
     
-    return mimeTypes[extension] || ''; // Return the MIME type for the given extension or empty string
+    return mimeTypes[extension] || ''; 
 }
