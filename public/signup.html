@@ -13,7 +13,7 @@
     <div class="signup-wrapper">
         <div class="stars"></div>
         <div class="floating-shape"></div>
-        <div class="floating-shape-2"></div>
+        <div class="floating-shape-2"></div> <br>
         <!-- Logo -->
         <div class="logo-container">
             <div class="logo-s">
@@ -45,7 +45,24 @@
                     <label for="password">Password</label>
                     <input id="password" class="inner-input" type="password" name="password" required />
 
-                    <button type="submit" name="Submit" class="signup-btn-big">Sign Up</button>
+                    <!-- Strength Meter Bar -->
+                    <div id="strength-meter"></div>
+
+                    <!-- Password Criteria -->
+                    <ul id="password-criteria">
+                        <li id="length"><input title="at-least-8" type="checkbox" disabled /> At least 8 characters</li>
+                        <li id="uppercase"><input title="at-leastone-uppercase" type="checkbox" disabled /> At least one
+                            uppercase letter</li>
+                        <li id="lowercase"><input title="at-least-one-lower" type="checkbox" disabled /> At least one
+                            lowercase letter</li>
+                        <li id="number"><input title="at-least-one-number" type="checkbox" disabled /> At least one
+                            number</li>
+                        <li id="special"><input title="at-least-onespecial" type="checkbox" disabled /> At least one
+                            special character</li>
+                    </ul>
+
+                    <button type="button" id="signup-button" name="Submit" class="signup-btn-big">Sign
+                        Up</button>
                 </form>
             </div>
             <div class="bottom-container">
@@ -55,51 +72,189 @@
     </div>
     <script src="js/main.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("signup-form");
+        const signupButton = document.getElementById("signup-button");
+        const form = document.getElementById("signup-form");
+        const passwordInput = document.getElementById('password');
+        const strengthMeter = document.getElementById('strength-meter');
 
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+        const criteria = {
+            length: document.getElementById('length'),
+            uppercase: document.getElementById('uppercase'),
+            lowercase: document.getElementById('lowercase'),
+            number: document.getElementById('number'),
+            special: document.getElementById('special')
+        };
 
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+        passwordInput.addEventListener('input', () => {
+            const val = passwordInput.value;
 
-                try {
-                    const response = await fetch("/api/signup", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(data),
+            const checks = {
+                length: val.length >= 8,
+                uppercase: /[A-Z]/.test(val),
+                lowercase: /[a-z]/.test(val),
+                number: /[0-9]/.test(val),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(val)
+            };
+
+            let score = 0;
+            for (const key in checks) {
+                const listItem = criteria[key];
+                const checkbox = listItem.querySelector('input[type="checkbox"]');
+
+                if (checks[key]) {
+                    listItem.classList.add('valid');
+                    checkbox.checked = true;
+                    score++;
+                } else {
+                    listItem.classList.remove('valid');
+                    checkbox.checked = false;
+                }
+            }
+
+            // Update strength meter
+            const meterColors = ['red', 'orange', 'yellow', 'lightgreen', 'green'];
+            strengthMeter.innerHTML = `<div style="height:100%;width:${(score / 5) * 100}%;background:${meterColors[score - 1]};border-radius:5px;"></div>`;
+
+        });
+        signupButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Check for empty fields
+            const hasEmptyField = Object.values(data).some(val => val.trim() === "");
+            if (hasEmptyField) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Incomplete Details',
+                    text: 'Please fill in all the fields.',
+                    confirmButtonColor: '#d33'
+                });
+                return;
+            }
+
+            // Password checks
+            const val = passwordInput.value;
+            const checks = {
+                length: val.length >= 8,
+                uppercase: /[A-Z]/.test(val),
+                lowercase: /[a-z]/.test(val),
+                number: /[0-9]/.test(val),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(val)
+            };
+
+            const allPassed = Object.values(checks).every(v => v);
+
+            if (!allPassed) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Weak Password',
+                    text: 'Please meet all password requirements before signing up.',
+                    confirmButtonColor: '#d33'
+                });
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/signup", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.text();
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Signup successful!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = '/login.html';
                     });
-
-                    const result = await response.text(); // or .json() if your server sends JSON
-                    if (response.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Signup successful!',
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            window.location.href = '/login.html'; // Redirect to login after signup
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Signup failed',
-                            text: result // Display the error message from the backend
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
+                } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Something went wrong',
-                        text: 'Please try again later.'
+                        title: 'Signup failed',
+                        text: result
                     });
                 }
-            });
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Something went wrong',
+                    text: 'Please try again later.'
+                });
+            }
         });
+
+
+
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     const form = document.getElementById("signup-form");
+        //     const signupButton = document.getElementById('signup-button');
+
+        //     form.addEventListener("submit", async (e) => {
+        //         e.preventDefault();
+
+        //         if (signupButton.disabled) {
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Weak Password',
+        //                 text: 'Please meet all password requirements before signing up.',
+        //                 confirmButtonColor: '#d33'
+        //             });
+        //             return;
+        //         }
+
+        //         const formData = new FormData(form);
+        //         const data = Object.fromEntries(formData.entries());
+
+        //         try {
+        //             const response = await fetch("/api/signup", {
+        //                 method: "POST",
+        //                 headers: {
+        //                     "Content-Type": "application/json",
+        //                 },
+        //                 body: JSON.stringify(data),
+        //             });
+
+        //             const result = await response.text();
+
+        //             if (response.ok) {
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Signup successful!',
+        //                     showConfirmButton: false,
+        //                     timer: 1500
+        //                 }).then(() => {
+        //                     window.location.href = '/login.html';
+        //                 });
+        //             } else {
+        //                 Swal.fire({
+        //                     icon: 'error',
+        //                     title: 'Signup failed',
+        //                     text: result
+        //                 });
+        //             }
+        //         } catch (error) {
+        //             console.error("Error:", error);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Something went wrong',
+        //                 text: 'Please try again later.'
+        //             });
+        //         }
+        //     });
+        // });
+
+
+
     </script>
 </body>
 

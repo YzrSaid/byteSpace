@@ -18,7 +18,8 @@ h4 p {
   top: 0;
   display: flex;
   justify-content: space-between;
-  height: 70px;
+  align-items: center;
+  padding: 15px 0;
   width: 100%;
   background-color: #061b38;
   z-index: 1000;
@@ -29,7 +30,6 @@ h4 p {
   width: 145px;
 }
 .navbar .logo {
-  padding-top: 15px;
   height: 100%;
   padding-left: 65px;
 }
@@ -73,7 +73,6 @@ h4 p {
 }
 
 .main-navbar {
-  padding-top: 23px;
   padding-right: 120px;
   text-align: left;
 }
@@ -180,7 +179,7 @@ h4 p {
   background-color: var(--active-link-underline-color, white);
   position: absolute;
   left: 0;
-  bottom: -28px;
+  bottom: -32px;
 }
 
 .main-navbar-gen a.active {
@@ -253,14 +252,11 @@ label {
   padding: 0px 50px 150px 70px;
   display: flex;
   align-items: center;
-  height: 90.7vh;
+  height: 89.5vh;
   width: 100%;
   justify-content: space-between;
 }
 
-.main-div {
-  color: white;
-}
 .main-buttons-container {
   display: flex;
   gap: 10px;
@@ -268,11 +264,12 @@ label {
   align-items: center;
 }
 
-#integrity-div, #extension-check-div {
+#integrity-div,
+#extension-check-div {
   flex-direction: column;
   display: flex;
   align-items: center;
-  height: 90.7vh;
+  height: 89.5vh;
   gap: 20px;
   padding-top: 20px;
   width: 100%;
@@ -283,7 +280,7 @@ label {
   display: flex;
   padding: 50px;
   width: 100%;
-  background-color: #f9fff0;
+  background-color: white;
   height: 100vh;
 }
 #third-div {
@@ -301,7 +298,7 @@ label {
   font-weight: bold;
 }
 .title-l {
-  font-size: 70px;
+  font-size: 55px;
   font-family: "Montserrat", sans-serif;
   font-weight: bold;
 }
@@ -346,21 +343,64 @@ label {
   display: flex;
 }
 .feature-image {
-  margin-left: 200px;
+  margin-left: 300px;
   width: 50%;
 }
 .feature-image img {
-  width: 600px;
-  height: 400px;
+  width: 500px;
+  height: 500px;
 }
+#password-criteria {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+#strength-meter {
+  height: 10px;
+  width: 100%;
+  background: #ddd;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+
+#strength-meter::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 0%;
+  background-color: red;
+  border-radius: 5px;
+  transition: width 0.3s;
+}
+
+#password-criteria li {
+  color: black;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#password-criteria li.valid {
+  color: green;
+  font-weight: bold;
+}
+
+#password-criteria input[type="checkbox"] {
+  accent-color: green;
+  pointer-events: none;
+  transform: scale(1.1);
+}
+
 .scroll-to-top {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: rgb(33, 33, 33);
+  background-color: #333;
   color: white;
   border: none;
-  width: 60px;
+  width: 55px;
   height: 50px;
   border-radius: 5px;
   padding: 10px 15px;
@@ -390,10 +430,11 @@ label {
 footer {
   text-align: center;
   padding: 25px;
-  background-color: #f9fff0;
+  background-color: #061b38;
 }
 footer p {
   font-weight: 500;
+  color: white;
 }
 
 /* Responsive Design */
@@ -608,6 +649,10 @@ footer p {
     font-size: 10px;
   }
 }
+
+#extension-check-div, #integrity-div {
+    color: white !important;
+}
 .login-wrapper,
 .signup-wrapper {
   position: relative;
@@ -615,10 +660,13 @@ footer p {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   z-index: 1;
   background-color: #061b38;
   overflow: hidden;
+}
+
+.login-wrapper {
+    height: 100vh;
 }
 
 .floating-shape {
@@ -834,8 +882,11 @@ footer p {
 #login-title,
 #signup-title {
   font-size: 24px;
-  margin-bottom: 1.5rem;
   color: white;
+}
+
+#login-title {
+  margin-bottom: 1.5rem;
 }
 
 /* Login container styling */
