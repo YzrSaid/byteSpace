@@ -6,7 +6,7 @@ exports.checkFileIntegrity = (req, res) => {
     }
 
     try {
-        const fileBuffer = req.file.buffer;
+        const fileBuffer = req.file.buffer; 
         const hash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
 
         return res.json({
